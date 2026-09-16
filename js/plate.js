@@ -191,7 +191,7 @@ async function exportarPDF() {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(22);
     doc.setTextColor(30, 41, 59);
-    doc.text('CutMasterPro', 15, 20);
+    doc.text('IndCutPro', 15, 20);
     doc.setFontSize(10);
     doc.setTextColor(100, 116, 139);
     doc.text('Reporte de Optimización de Cortes', 15, 26);
@@ -279,7 +279,7 @@ async function exportarPDF() {
         doc.setPage(page);
         doc.setFontSize(8);
         doc.setTextColor(150);
-        doc.text(`CutMasterPro by Invertya - Página ${page} de ${totalPages}`, 105, 290, null, null, 'center');
+        doc.text(`IndCutPro by Invertya - Página ${page} de ${totalPages}`, 105, 290, null, null, 'center');
     }
-    doc.save(`CutMasterPro_Plan_${Date.now()}.pdf`);
+    doc.save(`IndCutPro_Plan_${Date.now()}.pdf`);
 }

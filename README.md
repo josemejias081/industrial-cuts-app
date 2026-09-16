@@ -1,6 +1,6 @@
-# CutMaster Pro
+# IndCut Pro
 
-CutMaster Pro es una herramienta web para planificar cortes industriales sobre barras, perfiles, placas y tableros. Permite distribuir piezas, considerar el kerf de corte, visualizar los planos de trabajo y exportar reportes PDF para producción.
+IndCut Pro es una herramienta web para planificar cortes industriales sobre barras, perfiles, placas y tableros. Permite distribuir piezas, considerar el kerf de corte, visualizar los planos de trabajo y exportar reportes PDF para producción.
 
 La aplicación está diseñada como una interfaz estática, ligera y orientada al uso diario en computadoras de escritorio y laptops.
 
@@ -164,7 +164,7 @@ Claves principales:
 
 | Clave | Uso |
 | --- | --- |
-| `cutmaster-theme` | Preferencia de modo claro u oscuro. |
+| `indcut-theme` | Preferencia de modo claro u oscuro. |
 | `wf_longitud` | Longitud de barra base. |
 | `wf_kerf` | Kerf utilizado para barras y perfiles. |
 | `wf_cortes` | Pedido de cortes lineales. |
