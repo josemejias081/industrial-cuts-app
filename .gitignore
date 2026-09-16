@@ -1,0 +1,27 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editor y herramientas locales
+.vscode/
+.idea/
+.history/
+
+# Dependencias y logs
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Variables y configuracion local
+.env
+.env.*
+!.env.example
+
+# Salidas generadas
+coverage/
+dist/
+build/
+*.pdf

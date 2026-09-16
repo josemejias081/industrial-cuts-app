@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CutMaster Pro | Optimizador de Cortes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/tubular.css">
+    <script>document.documentElement.dataset.theme = localStorage.getItem('cutmaster-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');</script>
+</head>
+<body class="grid-pattern bg-slate-50 min-h-screen p-4 md:p-8 font-sans text-slate-900">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="flex items-center justify-between border-b border-slate-200 pb-5">
+            <a href="index.html" class="flex items-center gap-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-50" aria-label="CutMaster Pro, inicio">
+                <span class="rounded-lg bg-blue-600 p-2 text-white">
+                    <i data-lucide="layers" class="h-6 w-6" aria-hidden="true"></i>
+                </span>
+                <span class="text-xl font-black tracking-tight text-slate-800">CutMaster<span class="text-blue-600">Pro</span></span>
+            </a>
+            <span class="hidden items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 sm:flex">
+                <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                Herramientas disponibles
+            </span>
+            <button type="button" onclick="toggleTheme()" class="theme-toggle rounded-xl border border-slate-300 p-2 text-slate-500 transition hover:border-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600" aria-label="Cambiar a modo claro">
+                <i data-lucide="sun" class="theme-dark-only h-5 w-5" aria-hidden="true"></i>
+                <i data-lucide="moon" class="theme-light-only h-5 w-5" aria-hidden="true"></i>
+            </button>
+        </header>
+
+        <header class="mt-6 mb-8 flex flex-col md:flex-row justify-end items-center gap-6 bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+            <div class="flex flex-wrap justify-center gap-3">
+                <div class="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
+                    <span class="px-3 text-[10px] font-bold text-slate-500 uppercase">Barra Base (mm):</span>
+                    <input type="number" id="longitudBase" value="12000" onchange="cambiarLongitudBase()" 
+                        class="w-24 p-2 bg-white border-none rounded-lg font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-400 text-center">
+                </div>
+                <div class="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
+                    <label for="kerf" class="px-3 text-[10px] font-bold text-slate-500 uppercase">Kerf (mm):</label>
+                    <input type="number" id="kerf" value="0" min="0" step="1" onchange="cambiarKerf()"
+                        class="w-16 p-2 bg-white border-none rounded-lg font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-400 text-center">
+                </div>
+                <button onclick="limpiarTodo()" class="flex items-center gap-2 px-4 py-2 text-red-500 font-semibold hover:bg-red-50 rounded-xl transition">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> Limpiar
+                </button>
+                <button onclick="exportarPDF()" id="btnPDF" class="hidden flex items-center gap-2 px-6 py-2 bg-slate-900 text-white rounded-xl hover:bg-black transition shadow-lg active:scale-95 font-bold">
+                    <i data-lucide="file-down" class="w-4 h-4"></i> Descargar PDF
+                </button>
+            </div>
+        </header>
+
+        <div class="grid lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                    <h2 class="text-sm font-black mb-5 text-slate-400 uppercase tracking-widest">Añadir Piezas</h2>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Longitud (mm)</label>
+                                <input type="number" id="medida" value="0" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1">Cantidad</label>
+                                <input type="number" id="cantidad" value="0" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                        </div>
+                        <button onclick="agregarCorte()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition-all flex justify-center items-center gap-2">
+                            Añadir a Pedido
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-700 text-xs">CORTES PENDIENTES</h3>
+                        <span id="contadorTotal" class="text-[10px] bg-blue-50 px-2 py-1 rounded-full font-bold text-blue-600 uppercase">0 ítems</span>
+                    </div>
+                    <div id="listaCortes" class="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                        </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8" id="contenedorResultados">
+                <div class="bg-white border-2 border-dashed border-slate-200 rounded-[2.5rem] py-32 text-center">
+                    <i data-lucide="activity" class="w-16 h-16 mx-auto mb-4 text-slate-200"></i>
+                    <p class="text-slate-400 font-medium">Configure sus cortes para iniciar la optimización</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js" defer></script>
+    <script src="js/tubular.js" defer></script>
+</body>
+</html>
