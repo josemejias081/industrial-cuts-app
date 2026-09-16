@@ -93,6 +93,16 @@ Después abre:
 http://localhost:8000/
 ```
 
+## Demo online
+
+La aplicación está preparada para publicarse automáticamente mediante GitHub Pages:
+
+```text
+https://josemejias081.github.io/industrial-cuts-app/
+```
+
+Cada cambio enviado a la rama `main` dispara el workflow de publicación definido en [`.github/workflows/pages.yml`](.github/workflows/pages.yml).
+
 ### Opción 2: servidor con Ruby
 
 Si Ruby está disponible:
