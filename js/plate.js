@@ -182,7 +182,7 @@ function renderFinal() {
                     return `
                     <div class="pieza-item" data-x="${p.x}" data-y="${p.y}" data-fw="${p.fw}" data-fh="${p.fh}">
                         <span class="text-[7px] font-bold opacity-60 uppercase mb-1">${p.n}</span>
-                        <div class="cota-h">${p.fw}</div>
+                        <div class="cota-h"><span class="cota-h-text">${p.fw}</span></div>
                         <div class="cota-v"><span class="cota-v-text">${p.fh}</span></div>
                     </div>`;
                 }).join('')}
