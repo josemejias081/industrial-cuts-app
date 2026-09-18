@@ -25,3 +25,6 @@ coverage/
 dist/
 build/
 *.pdf
+
+# Notas y mejoras específicas de este entorno
+MEJORAS.local.md

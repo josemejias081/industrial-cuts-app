@@ -5,11 +5,15 @@ const TIPOS_CHAPA = {
 let tipoChapa = localStorage.getItem('wf_tipo_chapa') || '3000x1500';
 let CH_W = TIPOS_CHAPA[tipoChapa].ancho;
 let CH_H = TIPOS_CHAPA[tipoChapa].alto;
+let espesorChapa = localStorage.getItem('wf_espesor_chapa') || '1.5';
 const CANVAS_WIDTH = 732;
 let pedido = JSON.parse(localStorage.getItem('wf_biz_2d')) || [];
 let resultado = [];
 
+function formatoEspesor() { return espesorChapa.replace('.', ','); }
+
 document.getElementById('tipoChapa').value = tipoChapa;
+document.getElementById('espesorChapa').value = espesorChapa;
 
 window.onload = () => { renderLista(); if (pedido.length > 0) calcular2D(); };
 
@@ -42,6 +46,14 @@ function cambiarTipoChapa() {
     if (pedido.length > 0) calcular2D();
 }
 
+function cambiarEspesorChapa(nuevoEspesor) {
+    espesorChapa = nuevoEspesor;
+    localStorage.setItem('wf_espesor_chapa', espesorChapa);
+    document.querySelectorAll('.espesor-label').forEach(label => {
+        label.textContent = `${formatoEspesor()} mm`;
+    });
+}
+
 function escalaPlano() {
     return CANVAS_WIDTH / CH_W;
 }
@@ -71,25 +83,9 @@ function renderLista() {
     lucide.createIcons();
 }
 
-function calcular2D() {
-    const kerf = parseInt(document.getElementById('kerf').value) || 0;
-    const permiteRotar = document.getElementById('permiteRotar').checked;
-    let todas = [];
-    pedido.forEach(p => { for (let i = 0; i < p.c; i++) todas.push({ ...p }); });
-    todas.sort((a, b) => (b.w * b.h) - (a.w * a.h));
-
-    const piezaInvalida = todas.find(p => {
-        const cabeNormal = p.w + kerf <= CH_W && p.h + kerf <= CH_H;
-        const cabeRotada = permiteRotar && p.h + kerf <= CH_W && p.w + kerf <= CH_H;
-        return !cabeNormal && !cabeRotada;
-    });
-    if (piezaInvalida) {
-        alert(`La pieza ${piezaInvalida.n} (${piezaInvalida.w} x ${piezaInvalida.h} mm) no cabe en la chapa seleccionada.`);
-        return;
-    }
-
+function empaquetarPiezas(piezas, kerf, permiteRotar) {
     let chapas = [];
-    todas.forEach(p => {
+    piezas.forEach(p => {
         let puesto = false;
         let pw = p.w + kerf, ph = p.h + kerf;
 
@@ -102,8 +98,8 @@ function calcular2D() {
                     let fW = pw, fH = ph;
                     if (cabeR && (!cabeN || (esp.w - ph < esp.w - pw))) { fW = ph; fH = pw; }
                     ch.piezas.push({ ...p, x: esp.x, y: esp.y, fw: fW - kerf, fh: fH - kerf });
-                    let eD = { x: esp.x + fW, y: esp.y, w: esp.w - fW, h: fH };
-                    let eA = { x: esp.x, y: esp.y + fH, w: esp.w, h: esp.h - fH };
+                    let eD = { x: esp.x + fW, y: esp.y, w: esp.w - fW, h: esp.h };
+                    let eA = { x: esp.x, y: esp.y + fH, w: fW, h: esp.h - fH };
                     ch.espacios.splice(s, 1);
                     if (eD.w > 1) ch.espacios.push(eD);
                     if (eA.h > 1) ch.espacios.push(eA);
@@ -121,12 +117,42 @@ function calcular2D() {
             chapas.push({
                 piezas: [{ ...p, x: 0, y: 0, fw: fW - kerf, fh: fH - kerf }],
                 espacios: [
-                    { x: fW, y: 0, w: CH_W - fW, h: fH },
-                    { x: 0, y: fH, w: CH_W, h: CH_H - fH }
+                    { x: fW, y: 0, w: CH_W - fW, h: CH_H },
+                    { x: 0, y: fH, w: fW, h: CH_H - fH }
                 ].filter(espacio => espacio.w > 1 && espacio.h > 1)
             });
         }
     });
+    return chapas;
+}
+
+function calcular2D() {
+    const kerf = parseInt(document.getElementById('kerf').value) || 0;
+    const permiteRotar = document.getElementById('permiteRotar').checked;
+    let todas = [];
+    pedido.forEach(p => { for (let i = 0; i < p.c; i++) todas.push({ ...p }); });
+    todas.sort((a, b) => (b.w * b.h) - (a.w * a.h));
+
+    const piezaInvalida = todas.find(p => {
+        const cabeNormal = p.w + kerf <= CH_W && p.h + kerf <= CH_H;
+        const cabeRotada = permiteRotar && p.h + kerf <= CH_W && p.w + kerf <= CH_H;
+        return !cabeNormal && !cabeRotada;
+    });
+    if (piezaInvalida) {
+        alert(`La pieza ${piezaInvalida.n} (${piezaInvalida.w} x ${piezaInvalida.h} mm) no cabe en la chapa seleccionada.`);
+        return;
+    }
+
+    const ordenAlternativo = [];
+    let inicio = 0;
+    let fin = todas.length - 1;
+    while (inicio <= fin) {
+        ordenAlternativo.push(todas[inicio++]);
+        if (inicio <= fin) ordenAlternativo.push(todas[fin--]);
+    }
+
+    const resultados = [empaquetarPiezas(todas, kerf, permiteRotar), empaquetarPiezas(ordenAlternativo, kerf, permiteRotar)];
+    const chapas = resultados.reduce((mejor, actual) => actual.length < mejor.length ? actual : mejor);
     resultado = chapas;
     renderFinal();
 }
@@ -138,6 +164,7 @@ function renderFinal() {
     const contRetazos = document.getElementById('contenedorRetazos');
     const precio = parseFloat(document.getElementById('precioTablero').value) || 0;
     cont.innerHTML = '';
+    stats.classList.remove('hidden');
     contRetazos.classList.add('hidden');
     lRetazos.innerHTML = '';
     let areaU = 0, retazos = [];
@@ -147,7 +174,7 @@ function renderFinal() {
         <div class="bg-slate-900 p-8 rounded-[3rem] border border-slate-800" id="canvas-tablero-${i}">
             <div class="flex justify-between items-center mb-6 italic text-[10px] font-bold">
                 <span class="text-blue-500 uppercase">Tablero #${i + 1}</span>
-                <span class="text-slate-500 uppercase font-mono">${TIPOS_CHAPA[tipoChapa].etiqueta}</span>
+                <span class="text-slate-500 uppercase font-mono">${TIPOS_CHAPA[tipoChapa].etiqueta} · <span class="espesor-label">${formatoEspesor()} mm</span></span>
             </div>
             <div class="chapa-canvas">
                 ${ch.piezas.map(p => {
@@ -197,12 +224,13 @@ async function exportarPDF() {
     doc.text('Reporte de Optimización de Cortes', 15, 26);
     doc.setTextColor(51, 65, 85);
     doc.text(`Tipo de chapa: ${nombreChapa}`, 15, 36);
-    doc.text(`Kerf: ${document.getElementById('kerf').value} mm`, 15, 41);
-    doc.text(`Fecha y hora: ${fechaHora}`, 15, 46);
-    doc.text(`Total de tableros necesarios: ${resultado.length}`, 15, 51);
+    doc.text(`Espesor de chapa: ${formatoEspesor()} mm`, 15, 41);
+    doc.text(`Kerf: ${document.getElementById('kerf').value} mm`, 15, 46);
+    doc.text(`Fecha y hora: ${fechaHora}`, 15, 51);
+    doc.text(`Total de tableros necesarios: ${resultado.length}`, 15, 56);
 
     doc.autoTable({
-        startY: 60,
+        startY: 65,
         head: [['Cantidad', 'Descripción de la pieza', 'Largo (mm)', 'Ancho (mm)']],
         body: pedido.map(p => [p.c, p.n, p.w, p.h]),
         theme: 'striped',

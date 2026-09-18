@@ -2,6 +2,9 @@
 
 body { background-color: #121212; color: #e4e4e7; }
 
+.espesor-select { background-color: #0f172a; color: #f8fafc; }
+.espesor-select option { background-color: #0f172a; color: #f8fafc; }
+
 .chapa-canvas {
     width: min(100%, 732px); aspect-ratio: 2 / 1; height: auto;
     position: relative; background-color: #0f172a;
@@ -58,3 +61,5 @@ html[data-theme="dark"] .text-blue-500 { color: #93c5fd !important; }
 html[data-theme="dark"] .text-red-500 { color: #fca5a5 !important; }
 html[data-theme="dark"] .text-emerald-500 { color: #6ee7b7 !important; }
 html[data-theme="light"] .chapa-canvas { background-color: #f8f9fa; border-color: #cbd5e1; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05); }
+html[data-theme="light"] .espesor-select { background-color: #ffffff; color: #0f172a; }
+html[data-theme="light"] .espesor-select option { background-color: #ffffff; color: #0f172a; }

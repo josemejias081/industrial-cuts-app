@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/plate.css">
+    <link rel="stylesheet" href="css/plate.css?v=2">
     <script>document.documentElement.dataset.theme = localStorage.getItem('indcut-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');</script>
 </head>
 <body class="grid-pattern p-4 md:p-8">
@@ -40,6 +40,29 @@
                     <select id="tipoChapa" onchange="cambiarTipoChapa()" class="bg-transparent text-sm font-black text-white outline-none text-center">
                         <option value="3000x1500">3000 x 1500 mm</option>
                         <option value="2000x1000">2000 x 1000 mm</option>
+                    </select>
+                </div>
+                <div class="bg-slate-800 p-3 px-5 rounded-2xl border border-slate-700 flex flex-col items-center">
+                    <label for="espesorChapa" class="text-[10px] font-bold text-slate-400 uppercase italic">Espesor informativo (mm)</label>
+                    <select id="espesorChapa" onchange="cambiarEspesorChapa(this.value)" class="espesor-select bg-transparent text-sm font-black text-white outline-none text-center">
+                        <option value="0.5">0,5 mm</option>
+                        <option value="0.7">0,7 mm</option>
+                        <option value="0.8">0,8 mm</option>
+                        <option value="1">1 mm</option>
+                        <option value="1.2">1,2 mm</option>
+                        <option value="1.5">1,5 mm</option>
+                        <option value="2">2 mm</option>
+                        <option value="2.5">2,5 mm</option>
+                        <option value="3">3 mm</option>
+                        <option value="4">4 mm</option>
+                        <option value="5">5 mm</option>
+                        <option value="6">6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                        <option value="15">15 mm</option>
+                        <option value="20">20 mm</option>
+                        <option value="25">25 mm</option>
                     </select>
                 </div>
                 <div class="bg-slate-800 p-3 px-6 rounded-2xl border border-slate-700 flex flex-col items-center">
@@ -95,6 +118,6 @@
     </div>
 
     <script src="js/common.js" defer></script>
-    <script src="js/plate.js" defer></script>
+    <script src="js/plate.js?v=4" defer></script>
 </body>
 </html>
